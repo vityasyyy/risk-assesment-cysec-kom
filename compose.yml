@@ -17,37 +17,5 @@ services:
     ports:
       - "8025:8025"
 
-  katana:
-    image: projectdiscovery/katana:latest
-    container_name: katana
-    entrypoint: ["/bin/sh", "-c"]
-    tty: true
-    stdin_open: true
-    volumes:
-      - ./scans:/scans
-    depends_on:
-      - juice
-
-  httpx:
-    image: projectdiscovery/httpx:latest
-    container_name: httpx
-    entrypoint: ["/bin/sh", "-c"]
-    tty: true
-    stdin_open: true
-    volumes:
-      - ./scans:/scans
-
-  nuclei:
-    image: projectdiscovery/nuclei:latest
-    container_name: nuclei
-    entrypoint: ["/bin/sh", "-c"]
-    tty: true
-    stdin_open: true
-    volumes:
-      - ./scans:/scans
-      - ./nuclei-templates:/root/.nuclei-templates # persist templates
-    depends_on:
-      - juice
-
 volumes:
   juice_data:
