@@ -8,19 +8,6 @@ services:
     networks:
       - scan-net
 
-  # ZAP daemon (optional but useful for live API control)
-  zap:
-    image: zaproxy/zap-stable:latest
-    container_name: zap
-    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
-    volumes:
-      - ./wrk:/zap/wrk # ZAP working dir (reports, temp files)
-    ports:
-      - "8080:8080" # ZAP API
-    networks:
-      - scan-net
-
-  # Zap-runner convenience image to run one-shot wrapper scripts (baseline/full)
   zap-runner:
     image: zaproxy/zap-stable:latest
     container_name: zap-runner
@@ -29,7 +16,7 @@ services:
       - ./wrk:/zap/wrk
     networks:
       - scan-net
-  # Nuclei - fast template-based vulnerability scanner (good complement to ZAP)
+
   nuclei:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei
@@ -38,10 +25,11 @@ services:
     networks:
       - scan-net
 
-  # Nikto - quick classic web scanner
   nikto:
     image: alpine/nikto:latest
     container_name: nikto
+    volumes:
+      - ./reports:/reports
     networks:
       - scan-net
 
