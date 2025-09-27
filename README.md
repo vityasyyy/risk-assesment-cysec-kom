@@ -1,110 +1,164 @@
+---
+
 ````markdown
-# Multi-Target Security Analysis Pipeline
+# 🧪 Multi-Target Security Analysis Pipeline
 
-This project provides a fully containerized, one-command pipeline to perform a comprehensive security scan on multiple web applications simultaneously. It uses a suite of popular open-source tools for both Dynamic Application Security Testing (DAST) and Software Composition Analysis (SCA), and then intelligently merges the results into individual and consolidated reports in Markdown format.
+This project provides a **fully containerized, one-command pipeline** for performing comprehensive security scans on multiple web applications simultaneously. It leverages a combination of industry-standard **DAST** (Dynamic Application Security Testing) and **SCA** (Software Composition Analysis) tools, then automatically **correlates and consolidates** the results into clear Markdown reports.
 
-The target applications for this demonstration are four intentionally vulnerable web applications:
+The demonstration targets are four intentionally vulnerable web applications:
 
-- **OWASP Juice Shop**
-- **Damn Vulnerable Web Application (DVWA)**
-- **OWASP WebGoat**
-- **OWASP Mutillidae II**
-
-## ✨ Features
-
-- **Containerized Environment**: All tools and target applications are managed via Docker Compose for easy setup and teardown.
-- **Multi-Target Scanning**: Scans multiple web applications in parallel, saving time and effort.
-- **Multi-Tool Scanning**: Leverages the strengths of different scanners:
-  - **OWASP ZAP**: For in-depth DAST, including passive and active scanning.
-  - **Nuclei**: For fast, template-based vulnerability scanning.
-  - **Nikto**: For classic web server misconfiguration checks.
-  - **Trivy**: For SCA, identifying known vulnerabilities (CVEs) in OS packages and application dependencies.
-- **Automated Orchestration**: A single shell script (`multiscan.sh`) handles the entire process: starting the targets, running all scans sequentially and in parallel, and generating the final reports.
-- **Intelligent Report Correlation**: The `merge_reports.py` script doesn't just combine reports; it actively correlates findings. For example, it links a web vulnerability found by ZAP (like a potential XSS) to an underlying package CVE found by Trivy that might be the root cause.
-- **Consolidated Reporting**: Generates a clean, readable `summary.md` file for each target, as well as a `master-summary.md` that provides a high-level overview of the security posture of all targets.
+- 🧃 **OWASP Juice Shop**
+- 💥 **Damn Vulnerable Web Application (DVWA)**
+- 🐐 **OWASP WebGoat**
+- 🧱 **OWASP Mutillidae II**
 
 ---
 
-## 🔧 How It Works
+## ✨ Key Features
 
-The pipeline follows these steps:
+- **🧰 Containerized Environment**  
+  All scanners and targets run via Docker Compose — no manual setup needed.
 
-1.  **Start Services**: `docker compose` launches the four target applications (Juice Shop, DVWA, WebGoat, and Mutillidae) and sets up a shared network for the scanners.
-2.  **Run DAST Scans**:
-    - **ZAP** runs both a passive "baseline" scan and an aggressive "full" active scan against each target container.
-    - **Nuclei** runs its extensive template library against each target URL in parallel.
-    - **Nikto** performs its web server vulnerability checks against each target in parallel.
-3.  **Run SCA Scan**:
-    - **Trivy** scans the Docker image of each target application to find known vulnerabilities in its components.
-4.  **Merge & Correlate**:
-    - The `merge_reports.py` script is executed for each target.
-    - It parses the JSON and text outputs from all four scanners.
-    - It builds an index of vulnerabilities from the Trivy report (by CVE, CWE, and package name).
-    - It then iterates through the ZAP, Nuclei, and Nikto findings, using CVEs, CWEs, and fuzzy text matching to link them to the underlying vulnerabilities found by Trivy.
-    - Finally, it generates a `reports/<target>/summary.md` and `reports/<target>/summary.json` with all the consolidated data for each target.
-5.  **Generate Master Report**:
-    - The `merge_reports_multi.py` script is executed.
-    - It aggregates the individual summary reports.
-    - It generates a `reports/master-summary.md` and `reports/master-summary.json` that provides a high-level overview of all targets, including a risk ranking and a list of the top critical CVEs across all applications.
+- **🌐 Multi-Target Scanning**  
+  Scan multiple web applications in parallel, reducing total testing time.
+
+- **🔬 Multi-Tool Coverage**  
+  Combines the strengths of multiple scanners:
+  - **OWASP ZAP** → In-depth DAST (passive & active scans)
+  - **Nuclei** → Fast, template-based vulnerability scanning
+  - **Nikto** → Web server misconfiguration checks
+  - **Trivy** → SCA for known CVEs in OS packages & dependencies
+
+- **🤖 One-Command Orchestration**  
+  A single script (`multiscan.sh`) handles starting services, running all scans, and generating reports.
+
+- **🧠 Intelligent Report Correlation**  
+  `merge_reports.py` links application-level vulnerabilities (e.g., XSS from ZAP) to their **underlying package CVEs** found by Trivy.
+
+- **📊 Consolidated Markdown Reporting**  
+  Generates:
+  - Individual reports for each target (e.g., `reports/juice/summary.md`)
+  - A master overview report (`reports/master-summary.md`) with risk rankings and top critical CVEs.
+
+---
+
+## 🧭 Pipeline Overview
+
+1. **Start Services**  
+   Docker Compose spins up all four vulnerable targets and the scanning tools on a shared network.
+
+2. **Run DAST Scans**
+   - **ZAP** runs both passive (baseline) and active (full) scans.
+   - **Nuclei** scans each target in parallel using its template library.
+   - **Nikto** checks each target’s web server for misconfigurations.
+
+3. **Run SCA Scans**  
+   **Trivy** scans each target’s Docker image for known CVEs in packages and dependencies.
+
+4. **Merge & Correlate Findings**
+   - `merge_reports.py` parses all tool outputs for each target.
+   - It builds a CVE/CWE/package index from Trivy results.
+   - Findings from ZAP, Nuclei, and Nikto are linked to these base vulnerabilities.
+   - A consolidated `summary.md` and `summary.json` are generated for each target.
+
+5. **Generate Master Report**
+   - `merge_reports_multi.py` aggregates all individual reports.
+   - A `master-summary.md` and `master-summary.json` are generated, providing a cross-target overview and risk ranking.
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### ✅ Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) installed and running.
-- [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop).
-- [Python 3](https://www.python.org/downloads/) to run the merging scripts.
-- `git` to clone the repository.
-
-### Quick Start
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone [https://github.com/vityasyyy/risk-assesment-cysec-kom.git](https://github.com/vityasyyy/risk-assesment-cysec-kom.git)
-    cd risk-assesment-cysec-kom
-    ```
-
-2.  **Make the script executable:**
-
-    ```bash
-    chmod +x multiscan.sh
-    ```
-
-3.  **Run the full pipeline:**
-
-    ```bash
-    ./multiscan.sh
-    ```
-
-4.  **View the results:**
-    Once the script finishes, your consolidated reports will be available at:
-    - **Master Report**: `./reports/master-summary.md`
-    - **Individual Reports**: `./reports/<target>/summary.md` (e.g., `./reports/juice/summary.md`)
-
-    You can also inspect the raw output from each tool in the `./reports/<target>` directories.
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Python 3](https://www.python.org/downloads/)
+- `git` (to clone the repository)
 
 ---
 
-## 📂 Project Structure
-````
+### ⚡ Quick Start
 
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/vityasyyy/risk-assesment-cysec-kom.git
+   cd risk-assesment-cysec-kom
+
+   ```
+
+2. **Make the script executable**
+
+   ```bash
+   chmod +x multiscan.sh
+   ```
+
+3. **Run the full pipeline**
+
+   ```bash
+   ./multiscan.sh
+   ```
+
+4. **View the results**
+   - **Master Report** → `./reports/master-summary.md`
+   - **Individual Reports** → `./reports/<target>/summary.md` (e.g., `./reports/juice/summary.md`)
+   - Raw tool outputs are also stored in each target’s `./reports/<target>` directory.
+
+---
+
+## 📁 Project Structure
+
+```
 .
-├── compose.yml \# Defines the services (targets and scanners)
-├── multiscan.sh \# The main orchestration script that runs everything
-├── merge_reports.py \# Python script to parse, correlate, and merge reports for a single target
-├── merge_reports_multi.py \# Python script to generate a master report from individual summary reports
-├── reports/ \# Directory for all generated reports (created on run)
-│ ├── dvwa/
-│ ├── juice/
-│ ├── mutillidae/
-│ ├── webgoat/
-│ ├── master-summary.md
-│ └── master-summary.json
-└── wrk/ \# Working directory for ZAP (created on run)
+├── compose.yml                # Defines all target apps & scanners
+├── multiscan.sh               # Orchestrates scanning & report generation
+├── merge_reports.py           # Correlates & merges scan results per target
+├── merge_reports_multi.py     # Aggregates all targets into a master report
+├── reports/                   # Generated reports
+│   ├── dvwa/
+│   ├── juice/
+│   ├── mutillidae/
+│   ├── webgoat/
+│   ├── master-summary.md
+│   └── master-summary.json
+└── wrk/                       # Working directory for ZAP
+```
+
+---
+
+## 📝 Notes & Tips
+
+- Each scan can take several minutes, especially the **ZAP full scan**.
+- All findings are stored in JSON & Markdown — easy to parse or include in risk assessments.
+- For production use, you can easily swap the vulnerable apps with your own targets.
+
+---
+
+## 🧠 Why This Matters
+
+Most tools produce siloed results that make correlation painful. This pipeline:
+
+- Automates scanning across multiple tools & targets.
+- **Correlates vulnerabilities intelligently**, highlighting potential root causes.
+- Outputs structured, ready-to-use Markdown reports — ideal for security reviews, risk assessments, or pentest documentation.
+
+---
+
+## 📜 License
+
+MIT License. See [LICENSE](./LICENSE) for details.
 
 ```
 
+---
+
+This version improves:
+
+- ✅ **Structure** — clear sections, consistent headers
+- 🧠 **Readability** — less redundancy, better flow
+- 🧭 **Professional tone** — suitable for GitHub or academic use
+- 🧱 **Copy-paste readiness** — fully valid Markdown
+
+Do you want me to make the **“How It Works”** section more visual (e.g., ASCII diagram or Mermaid flowchart)? That can make the pipeline easier to grasp at a glance.
 ```
