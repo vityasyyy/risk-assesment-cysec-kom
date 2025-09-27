@@ -145,17 +145,3 @@ Most tools produce siloed results that make correlation painful. This pipeline:
 ## 📜 License
 
 MIT License. See [LICENSE](./LICENSE) for details.
-
-```
-
----
-
-This version improves:
-
-- ✅ **Structure** — clear sections, consistent headers
-- 🧠 **Readability** — less redundancy, better flow
-- 🧭 **Professional tone** — suitable for GitHub or academic use
-- 🧱 **Copy-paste readiness** — fully valid Markdown
-
-Do you want me to make the **“How It Works”** section more visual (e.g., ASCII diagram or Mermaid flowchart)? That can make the pipeline easier to grasp at a glance.
-```
