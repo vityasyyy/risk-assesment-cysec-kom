@@ -1,4 +1,5 @@
 services:
+  # Target applications
   juice:
     image: bkimminich/juice-shop:latest
     container_name: juice
@@ -8,12 +9,47 @@ services:
     networks:
       - scan-net
 
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: dvwa
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    networks:
+      - scan-net
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+
+  webgoat:
+    image: webgoat/goatandwolf:latest
+    container_name: webgoat
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+      - "8083:8080"
+    networks:
+      - scan-net
+
+  mutillidae:
+    image: citizenstig/nowasp:latest
+    container_name: mutillidae
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    networks:
+      - scan-net
+
+  # Scanner services
   zap-runner:
     image: zaproxy/zap-stable:latest
     container_name: zap-runner
     working_dir: /zap
     volumes:
       - ./wrk:/zap/wrk
+      - ./reports:/reports
     networks:
       - scan-net
 
