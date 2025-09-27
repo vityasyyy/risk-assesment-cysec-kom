@@ -1,6 +1,3 @@
----
-
-````markdown
 # 🧪 Multi-Target Security Analysis Pipeline
 
 This project provides a **fully containerized, one-command pipeline** for performing comprehensive security scans on multiple web applications simultaneously. It leverages a combination of industry-standard **DAST** (Dynamic Application Security Testing) and **SCA** (Software Composition Analysis) tools, then automatically **correlates and consolidates** the results into clear Markdown reports.
