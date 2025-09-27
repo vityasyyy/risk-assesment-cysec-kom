@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-merge_reports.py
-- Loads ZAP JSON, Trivy JSON, Nuclei JSONL, Nikto text
-- Summarizes each scanner's output
-- Correlates by CVE, CWE, and technology/package fingerprints
-- Produces a human-friendly Markdown summary and a machine JSON summary
-"""
 
 import json
 import os
