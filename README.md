@@ -8,6 +8,7 @@ The demonstration targets are four intentionally vulnerable web applications:
 - 💥 **Damn Vulnerable Web Application (DVWA)**
 - 🐐 **OWASP WebGoat**
 - 🧱 **OWASP Mutillidae II**
+- ⚡ **Bl1tz Store**
 
 ---
 
@@ -113,6 +114,7 @@ The demonstration targets are four intentionally vulnerable web applications:
 ├── merge_reports.py           # Correlates & merges scan results per target
 ├── merge_reports_multi.py     # Aggregates all targets into a master report
 ├── reports/                   # Generated reports
+│   ├── bl1tz_store/
 │   ├── dvwa/
 │   ├── juice/
 │   ├── mutillidae/
