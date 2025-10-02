@@ -1,0 +1,99 @@
+{
+  "counts": {
+    "zap": 0,
+    "nuclei": 0,
+    "trivy": 0,
+    "nikto": 14
+  },
+  "zap": [],
+  "nuclei": [],
+  "trivy": [],
+  "nikto": [
+    {
+      "source": "nikto",
+      "text": "- Nikto v2.1.6/2.1.5",
+      "url": "/2.1.5",
+      "raw": "- Nikto v2.1.6/2.1.5"
+    },
+    {
+      "source": "nikto",
+      "text": "+ Target Host: 95.182.100.126",
+      "url": null,
+      "raw": "+ Target Host: 95.182.100.126"
+    },
+    {
+      "source": "nikto",
+      "text": "+ Target Port: 5000",
+      "url": null,
+      "raw": "+ Target Port: 5000"
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The anti-clickjacking X-Frame-Options header is not present.",
+      "url": null,
+      "raw": "+ GET The anti-clickjacking X-Frame-Options header is not present."
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS",
+      "url": null,
+      "raw": "+ GET The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS"
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type",
+      "url": null,
+      "raw": "+ GET The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type"
+    },
+    {
+      "source": "nikto",
+      "text": "+ OPTIONS Allowed HTTP Methods: GET, OPTIONS, HEAD",
+      "url": null,
+      "raw": "+ OPTIONS Allowed HTTP Methods: GET, OPTIONS, HEAD"
+    },
+    {
+      "source": "nikto",
+      "text": "- Nikto v2.1.6/2.1.5",
+      "url": "/2.1.5",
+      "raw": "- Nikto v2.1.6/2.1.5"
+    },
+    {
+      "source": "nikto",
+      "text": "+ Target Host: 95.182.100.126",
+      "url": null,
+      "raw": "+ Target Host: 95.182.100.126"
+    },
+    {
+      "source": "nikto",
+      "text": "+ Target Port: 5000",
+      "url": null,
+      "raw": "+ Target Port: 5000"
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The anti-clickjacking X-Frame-Options header is not present.",
+      "url": null,
+      "raw": "+ GET The anti-clickjacking X-Frame-Options header is not present."
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS",
+      "url": null,
+      "raw": "+ GET The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS"
+    },
+    {
+      "source": "nikto",
+      "text": "+ GET The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type",
+      "url": null,
+      "raw": "+ GET The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type"
+    },
+    {
+      "source": "nikto",
+      "text": "+ OPTIONS Allowed HTTP Methods: GET, OPTIONS, HEAD",
+      "url": null,
+      "raw": "+ OPTIONS Allowed HTTP Methods: GET, OPTIONS, HEAD"
+    }
+  ],
+  "zap_correlation": [],
+  "nuclei_correlation": []
+}

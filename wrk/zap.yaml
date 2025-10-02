@@ -3,7 +3,7 @@ env:
   - excludePaths: []
     name: baseline
     urls:
-    - http://mutillidae:80
+    - http://95.182.100.126:5000
   parameters:
     failOnError: true
     progressToStdout: false
@@ -14,7 +14,7 @@ jobs:
   type: passiveScan-config
 - parameters:
     maxDuration: 1
-    url: http://mutillidae:80
+    url: http://95.182.100.126:5000
   type: spider
 - parameters:
     maxDuration: 0
@@ -27,14 +27,14 @@ jobs:
 - parameters:
     reportDescription: ''
     reportDir: /zap/wrk/
-    reportFile: baseline-mutillidae.html
+    reportFile: baseline-external_site.html
     reportTitle: ZAP Scanning Report
     template: traditional-html
   type: report
 - parameters:
     reportDescription: ''
     reportDir: /zap/wrk/
-    reportFile: baseline-mutillidae.json
+    reportFile: baseline-external_site.json
     reportTitle: ZAP Scanning Report
     template: traditional-json
   type: report
