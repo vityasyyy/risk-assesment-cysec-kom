@@ -1,6 +1,6 @@
 # 🎯 Multi-Target Security Scan Report
 
-**Generated:** 2025-10-03 14:29:26
+**Generated:** 2025-10-03 14:37:39
 **Targets scanned:** 4
 
 ## 📊 Executive Summary
@@ -1105,11 +1105,15 @@ Detailed reports for each target:
 
 ### 📖 Impact Score Methodology
 
-The Impact Score is calculated using the formula:
+The Impact Score is calculated using the selected method:
+
+**Multiplicative Method** (current):
 
 ```
 Impact Score = CVSS Base Score × CWE Risk Factor × Asset Criticality Factor
 ```
+
+This method can produce scores > 10 to emphasize compound risks.
 
 **Scoring Levels:**
 
@@ -1118,3 +1122,7 @@ Impact Score = CVSS Base Score × CWE Risk Factor × Asset Criticality Factor
 - **MEDIUM (5.0-6.9):** Important remediation within 1 week (P2)
 - **LOW (3.0-4.9):** Normal remediation within 1 month (P3)
 - **INFO (<3.0):** Monitor and review (P4)
+
+### ⚠️ Disclaimer
+
+This automated scan provides an initial security assessment. Manual verification is required for all findings. False positives are possible, especially for informational findings. Impact scores are calculated algorithmically and should be validated by security professionals.

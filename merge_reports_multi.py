@@ -265,14 +265,26 @@ def get_cwe_info(cwe_id: str) -> Dict[str, Any]:
 
 
 def calculate_exploit_impact(
-    cvss_score: float, severity: str, cwes: List[str], asset_type: str
+    cvss_score: float,
+    severity: str,
+    cwes: List[str],
+    asset_type: str,
+    method: str = "multiplicative",
 ) -> Dict[str, Any]:
-    """Calculate comprehensive exploit impact factor"""
+    """Calculate comprehensive exploit impact factor
+
+    Args:
+        cvss_score: Base CVSS score
+        severity: Severity level
+        cwes: List of CWE IDs
+        asset_type: Type of asset affected
+        method: 'multiplicative' or 'weighted_sum'
+    """
 
     # Base score from CVSS
     base_score = cvss_score if cvss_score else 5.0
 
-    # CWE multiplier
+    # CWE multiplier/weight
     cwe_multiplier = 1.0
     max_cwe_impact = 0
     if cwes:
@@ -281,7 +293,7 @@ def calculate_exploit_impact(
             max_cwe_impact = max(max_cwe_impact, cwe_info["base_impact"])
         cwe_multiplier = 1 + (max_cwe_impact / 10)
 
-    # Asset criticality multiplier
+    # Asset criticality multiplier/weight
     asset_multipliers = {
         "web_application": 1.3,
         "api_endpoint": 1.4,
@@ -294,8 +306,19 @@ def calculate_exploit_impact(
     }
     asset_mult = asset_multipliers.get(asset_type, 1.0)
 
-    # Calculate final impact
-    final_impact = base_score * cwe_multiplier * asset_mult
+    # Calculate final impact using selected method
+    if method == "weighted_sum":
+        # Weighted sum approach (keeps score in 0-10 range)
+        # Formula: (CVSS * 0.5) + (CWE_Impact * 0.3) + (Asset_Criticality * 2.0)
+        final_impact = (
+            (base_score * 0.5)
+            + (max_cwe_impact * 0.3)
+            + ((asset_mult - 1.0) * 10.0 * 0.2)
+        )
+        final_impact = min(final_impact, 10.0)  # Cap at 10.0
+    else:
+        # Multiplicative approach (can exceed 10)
+        final_impact = base_score * cwe_multiplier * asset_mult
 
     # Determine impact level
     if final_impact >= 9.0:
@@ -319,8 +342,13 @@ def calculate_exploit_impact(
         "level": impact_level,
         "priority": priority,
         "cvss_base": base_score,
-        "cwe_factor": round(cwe_multiplier, 2),
-        "asset_factor": asset_mult,
+        "cwe_factor": round(cwe_multiplier, 2)
+        if method == "multiplicative"
+        else max_cwe_impact,
+        "asset_factor": asset_mult
+        if method == "multiplicative"
+        else round((asset_mult - 1.0) * 10.0, 2),
+        "method": method,
     }
 
 
@@ -482,7 +510,7 @@ def get_references(cve: str, cwe: str) -> List[str]:
 
 
 def build_correlation_table(
-    target_reports: Dict[str, Dict[str, Any]],
+    target_reports: Dict[str, Dict[str, Any]], impact_method: str = "multiplicative"
 ) -> List[Dict[str, Any]]:
     """Build comprehensive CVE-CWE-Asset-Vulnerability correlation table"""
 
@@ -519,7 +547,9 @@ def build_correlation_table(
             )
 
             asset_type = determine_asset_type(vuln, "trivy")
-            impact = calculate_exploit_impact(cvss, severity, cwes, asset_type)
+            impact = calculate_exploit_impact(
+                cvss, severity, cwes, asset_type, impact_method
+            )
             guidance = generate_assessment_guidance(
                 cve, cwes, asset_type, vuln_name, impact
             )
@@ -579,7 +609,9 @@ def build_correlation_table(
             )
 
             asset_type = determine_asset_type(finding, "zap")
-            impact = calculate_exploit_impact(cvss, risk, cwes, asset_type)
+            impact = calculate_exploit_impact(
+                cvss, risk, cwes, asset_type, impact_method
+            )
             guidance = generate_assessment_guidance(
                 "N/A", cwes, asset_type, vuln_name, impact
             )
@@ -640,7 +672,9 @@ def build_correlation_table(
             )
 
             asset_type = determine_asset_type(finding, "nuclei")
-            impact = calculate_exploit_impact(cvss, severity, cwes, asset_type)
+            impact = calculate_exploit_impact(
+                cvss, severity, cwes, asset_type, impact_method
+            )
             guidance = generate_assessment_guidance(
                 "N/A", cwes, asset_type, vuln_name, impact
             )
@@ -1153,10 +1187,30 @@ def write_master_markdown(
         f.write("\n")
 
         f.write("### 📖 Impact Score Methodology\n\n")
-        f.write("The Impact Score is calculated using the formula:\n\n")
-        f.write(
-            "```\nImpact Score = CVSS Base Score × CWE Risk Factor × Asset Criticality Factor\n```\n\n"
+        f.write("The Impact Score is calculated using the selected method:\n\n")
+
+        # Detect method from first correlation
+        method = (
+            correlations[0]["impact"]["method"] if correlations else "multiplicative"
         )
+
+        if method == "multiplicative":
+            f.write("**Multiplicative Method** (current):\n")
+            f.write(
+                "```\nImpact Score = CVSS Base Score × CWE Risk Factor × Asset Criticality Factor\n```\n\n"
+            )
+            f.write(
+                "This method can produce scores > 10 to emphasize compound risks.\n\n"
+            )
+        else:
+            f.write("**Weighted Sum Method** (current):\n")
+            f.write(
+                "```\nImpact Score = (CVSS × 0.5) + (CWE Impact × 0.3) + (Asset Criticality × 0.2)\n```\n\n"
+            )
+            f.write(
+                "This method keeps scores within 0-10 range for easier comparison.\n\n"
+            )
+
         f.write("**Scoring Levels:**\n")
         f.write("- **CRITICAL (9.0+):** Immediate remediation required (P0)\n")
         f.write("- **HIGH (7.0-8.9):** Urgent remediation within 24-48h (P1)\n")
@@ -1225,6 +1279,12 @@ def main():
     parser.add_argument(
         "--debug", action="store_true", help="Print debug info about JSON structure"
     )
+    parser.add_argument(
+        "--impact-method",
+        choices=["multiplicative", "weighted_sum"],
+        default="multiplicative",
+        help="Method to calculate impact score: multiplicative (can exceed 10) or weighted_sum (capped at 10)",
+    )
 
     args = parser.parse_args()
 
@@ -1257,8 +1317,10 @@ def main():
             print()
 
     # Build correlation table
-    print("[+] Building CVE-CWE-Asset correlation table...")
-    correlations = build_correlation_table(target_reports)
+    print(
+        f"[+] Building CVE-CWE-Asset correlation table (using {args.impact_method} method)..."
+    )
+    correlations = build_correlation_table(target_reports, args.impact_method)
     print(f"[+] Correlated {len(correlations)} findings across all targets")
 
     # Generate master reports
@@ -1270,6 +1332,7 @@ def main():
         f"📊 Scanned {len(args.targets)} targets with {sum(sum(r['counts'].values()) for r in target_reports.values())} total findings"
     )
     print(f"🔗 Generated {len(correlations)} correlated vulnerability assessments")
+    print(f"📐 Impact calculation method: {args.impact_method}")
 
     # Summary stats
     critical_count = sum(1 for c in correlations if c["impact"]["level"] == "CRITICAL")
